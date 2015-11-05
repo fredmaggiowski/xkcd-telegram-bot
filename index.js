@@ -18,6 +18,7 @@ var token  = ctx.token,
 debug(ctx);
 
 var bot = new TelegramBot(token, {webHook: {port: ctx.server.port, host: ctx.server.host}});
+bot.setWebHook(tghook); // "https://xkcdbot.federicomaggi.me/bot"+token
 
 bot.on('message', function msgReceived(msg){
 
