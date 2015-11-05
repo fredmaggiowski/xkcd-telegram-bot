@@ -5,19 +5,16 @@
  *
  *	Thanks to Randall Munroe for all the fun!
  */
-
-var debug = require('debug')('debug');
+var debug = require('debug')('debug'),
+		ctx		= require('/config/config.json');
 
 var TelegramBot = require('node-telegram-bot-api');
 
 
-var token  = "token",
-	  tghook = "https://api.telegram.org/bot"+token;
+var token  = ctx.token,
+		tghook = "https://api.telegram.org/bot"+token;
 
-var port = 7654,
-		host = '0.0.0.0';
-
-var bot = new TelegramBot(token, {webHook: {port: port, host: host}});
+var bot = new TelegramBot(token, {webHook: {port: ctx.port, host: ctx.host}});
 
 bot.on('message', function msgReceived(msg){
 
