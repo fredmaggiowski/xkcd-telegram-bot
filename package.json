@@ -1,0 +1,28 @@
+{
+  "name": "xkcd-telegram-bot",
+  "version": "1.0.0",
+  "description": "An unofficial node.js based telegram bot for to share the awesomeness of xkcd.com ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/FredMaggiowski/xkcd-telegram-bot.git"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "xkcd.com",
+    "xkcd",
+    "federico",
+    "maggi"
+  ],
+  "author": "Federico Maggi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/FredMaggiowski/xkcd-telegram-bot/issues"
+  },
+  "readme": "Nothing to read for"
+  "homepage": "https://gitlab.com/FredMaggiowski/xkcd-telegram-bot#README"
+}
