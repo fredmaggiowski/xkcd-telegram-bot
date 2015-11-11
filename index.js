@@ -46,6 +46,11 @@ bot.on('message', function msgReceived(msg){
 			bot.sendMessage(chatId, "Fuck @AlexLanGame");
 			break;
 
+		case "/now":
+			cmddebug("Now command fired");
+			//xkcd.com/now
+			break;
+
 		default:
 			cmddebug("Default case");
 			break;
