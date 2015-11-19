@@ -37,8 +37,8 @@ var bunyan = require('bunyan'),
 
 // Require useful modules
 var http    = require('http'),
-    request = require('request'),
-    redis   = require('redis').createClient();//ctx.redis.port, ctx.redis.host);
+    request = require('request');
+//    redis   = require('redis').createClient(ctx.redis.port, ctx.redis.host);
 
 // Require node.js telegram Bot API
 var TelegramBot = require('node-telegram-bot-api');
@@ -52,7 +52,7 @@ debug(tghook);
 var theLatest = 0; // Should put this in REDIS (when I'll install it)
 
 var bot = new TelegramBot(token, {webHook: {port: ctx.hook.port, host: ctx.hook.address, cert:ctx.cert.crt, key:ctx.cert.key}})
-bot.setWebHook(tghook, require('fs').readFileSync(ctx.cert.crt, 'utf-8'));
+bot.setWebHook(tghook, ctx.cert.crt);// require('fs').readFileSync(ctx.cert.crt, 'utf-8'));
 
 bot.on('message', function msgReceived(msg){
   
@@ -167,10 +167,10 @@ setTimeout( function getLatestComicPolling( ){
       }
 
       theLatest = JSON.parse(body).num;
-			redis.set("latestcomic", JSON.parse(body).num, function (err, reply){ 
+	/*		redis.set("latestcomic", JSON.parse(body).num, function (err, reply){ 
 				reqdbg(err);
 				reqdbg(reply);
-			});	
+			});	*/
     } 
   })
 }, ctx.polling);
