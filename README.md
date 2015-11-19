@@ -1,5 +1,7 @@
 # xkcd Telegram bot
 ## Thanks to Randall Munroe for all the fun
+                
+        It'll be online soon, be patient
 
 # Commands
 - latest
