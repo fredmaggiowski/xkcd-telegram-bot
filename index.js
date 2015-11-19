@@ -5,48 +5,77 @@
  *
  *	Thanks to Randall Munroe for all the fun!
  */
+"use strict";
+// Load configuration
+var	ctx		= require('./config/config.json');
+
+// Require debug and logging modules
 var debug  = require('debug')('debug'),
 		reqdbg = require('debug')('request'),
 		cmddbg = require('debug')('cmd');
 
-var	ctx		= require('./config/config.json');
+var bunyan = require('bunyan'),
+		log		 = bunyan.createLogger(
+			{
+				name: "xkcdbot",
+				streams: [
+					{
+						level: 'info',
+						path: ctx.logpath.info
+					},
+					{
+						level: 'warn',
+						path: ctx.logpath.warn
+					},
+					{
+						level: 'error',
+						path: ctx.logpath.err
+					}	
+				]
+			}
+		);
 
+// Require useful modules
 var http 	= require('http'); 
 var request = require('request');
 
-
+// Require node.js telegram Bot API
 var TelegramBot = require('node-telegram-bot-api');
 
 var token  = ctx.token,
-    tghook = "https://"+ctx.hook.address+":"+ctx.hook.port+"/bot"+token;//+"/setWebhook";
+    tghook = "https://"+ctx.hook.address+":"+ctx.hook.port+"/"+token;//+"/setWebhook";
 
-//		tghook = "https://api.telegram.org/bot"+token+"/setWebhook";
+//		tghook = "https://api.telegram.org/"+token;
 
 debug(ctx);
 debug(tghook);
 
 var theLatest = 0; // Should put this in REDIS (when I'll install it)
 
-var bot = new TelegramBot(token, {webHook: {port: ctx.hook.port, host: ctx.hook.address}})
-bot.setWebHook(tghook, ctx.cert.crt);
+var bot = new TelegramBot(token, {webHook: {port: ctx.hook.port, host: ctx.hook.address, cert:ctx.cert.crt, key:ctx.cert.key}})
+bot.setWebHook(tghook, require('fs').readFileSync(ctx.cert.crt, "utf-8"));
 
+// bot.sendMessage(23700853,"ciao");
 bot.on('message', function msgReceived(msg){
+	
+	log.info(msg);
 
 	debug("messaggio:", msg);
 
 	var chatId = msg.chat.id;
-	var msgarr = msg.split(" ");
+	var msgarr = msg.text.split(" ");
 
 	//	redis.set(ctx.redis.lbl.chatid,chatId);
 
-	bot.sendMessage(msg.chat.id, "ciao");
-
-	handlCommand( msgarr[0], function ( err, comic ){
+	handleCommand( msgarr[0], function ( err, comic ){
 
 		if( err )
 			return bot.sendMessage(chatId, JSON.parse(err).error);
 
 		// Do something with the comic.. like sending it via bot.sendMessage
+		comic = JSON.parse(comic);
+		debug(comic);
+		bot.sendMessage(chatId, comic.title+"\n"+comic.img+"\n"+comic.alt);
 
 	}, msgarr); 
 });
@@ -55,7 +84,7 @@ function handleCommand( cmd, cb, pars ){
 	var comic = {};
 	cmddbg(cmd);
 
-	switch(cmd){
+	switch(cmd.split("@")[0]){
 		case "/random": 
 			cmddbg("Random comic required");
 			var number = Math.floor(Math.random() * (theLatest + 1));
@@ -83,8 +112,13 @@ function handleCommand( cmd, cb, pars ){
 			//xkcd.com/now : 1335
 			return retrieveComic(1335, cb);
 
+		case "/help":
+			cmddbg("Help command");
+			return cb(JSON.stringify({error: "Help:\n\t- /getxkcd NUMBER -> get chosen comic\n\t- /random -> get a random comic\n\t- /latest -> get latest comic"}),null);
+
 		default:
 			cmddbg("Default case");
+			log.error("Command not found %s",cmd);
 			return cb(JSON.stringify({error: "command not found"}), null);
 	}
 }
