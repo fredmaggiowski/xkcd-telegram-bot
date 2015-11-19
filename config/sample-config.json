@@ -13,5 +13,9 @@
 		"info": "log/info.log",
 		"warn": "log/warn.log"
 	},
+	"redis": {
+		"port" : 6379,
+		"host" : "0.0.0.0"
+	},
 	"polling" : 10000 
 }

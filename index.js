@@ -36,8 +36,9 @@ var bunyan = require('bunyan'),
     );
 
 // Require useful modules
-var http  = require('http'); 
-var request = require('request');
+var http    = require('http'),
+    request = require('request'),
+    redis   = require('redis').createClient();//ctx.redis.port, ctx.redis.host);
 
 // Require node.js telegram Bot API
 var TelegramBot = require('node-telegram-bot-api');
@@ -166,6 +167,10 @@ setTimeout( function getLatestComicPolling( ){
       }
 
       theLatest = JSON.parse(body).num;
+			redis.set("latestcomic", JSON.parse(body).num, function (err, reply){ 
+				reqdbg(err);
+				reqdbg(reply);
+			});	
     } 
   })
 }, ctx.polling);

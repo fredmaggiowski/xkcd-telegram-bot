@@ -3,3 +3,4 @@
 /cert
 *.DS_Store
 *.log
+*.rdb
