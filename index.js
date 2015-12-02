@@ -59,6 +59,8 @@ var theLatest = 0; // Should put this in REDIS (when I'll install it)
 var bot = new TelegramBot(token, {webHook: {port: port, host: host}});
 bot.setWebHook(tghook);
 
+log.info(bot);
+
 bot.on('message', function msgReceived(msg){
   
   log.info(msg);
@@ -72,12 +74,16 @@ bot.on('message', function msgReceived(msg){
 
   handleCommand( msgarr[0], function ( err, comic ){
 
-    if( err )
+    if( err ){
+      log.error(err);
       return bot.sendMessage(chatId, JSON.parse(err).error);
+    }
 
     // Do something with the comic.. like sending it via bot.sendMessage
     comic = JSON.parse(comic);
+    log.info(comic);
     debug(comic);
+
     bot.sendMessage(chatId, comic.title+'\n'+comic.img+'\n'+comic.alt);
 
   }, msgarr); 
