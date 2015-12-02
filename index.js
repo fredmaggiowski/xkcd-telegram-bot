@@ -9,6 +9,10 @@
 // Load configuration
 var ctx = require('./config/config.json');
 
+// We're moving on OpenShift RHCloud
+var port = process.env.OPENSHIFT_NODEJS_PORT;
+var host = process.env.OPENSHIFT_NODEJS_IP;
+
 // Require debug and logging modules
 var debug  = require('debug')('debug'),
     reqdbg = require('debug')('request'),
@@ -37,22 +41,22 @@ var bunyan = require('bunyan'),
 
 // Require useful modules
 var http    = require('http'),
-    request = require('request'),
-    redis   = require('redis').createClient();//ctx.redis.port, ctx.redis.host);
+    request = require('request');
+    // redis   = require('redis').createClient();//ctx.redis.port, ctx.redis.host);
 
 // Require node.js telegram Bot API
 var TelegramBot = require('node-telegram-bot-api');
 
 var token  = ctx.token,
-    tghook = 'https://'+ctx.hook.address+':'+ctx.hook.port+'/'+token;//+'/setWebhook';
+    tghook = 'https://'+ctx.hook.address+':'+ctx.hook,port+'/'+token;//+'/setWebhook';
 
 debug(ctx);
 debug(tghook);
 
 var theLatest = 0; // Should put this in REDIS (when I'll install it)
 
-var bot = new TelegramBot(token, {webHook: {port: ctx.hook.port, host: ctx.hook.address, cert:ctx.cert.crt, key:ctx.cert.key}})
-bot.setWebHook(tghook, require('fs').readFileSync(ctx.cert.crt, 'utf-8'));
+var bot = new TelegramBot(token, {webHook: {port: port, host: host});
+bot.setWebHook(tghook);
 
 bot.on('message', function msgReceived(msg){
   
