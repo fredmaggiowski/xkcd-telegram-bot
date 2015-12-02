@@ -179,6 +179,7 @@ setTimeout( function getLatestComicPolling( ){
   })
 }, ctx.polling);
 
+/*
 // This HTTP server is for testing purposes! In future updates it will be started only when required!
 http.createServer( function (req,res){
   
@@ -200,3 +201,4 @@ http.createServer( function (req,res){
     });
   })
   .listen(8444);
+*/
