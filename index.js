@@ -158,7 +158,7 @@ function retrieveComic( number, cb ){
       console.log(body);
       return cb(null, body);
     }
-
+ 
     log.error(error);
   });
 }
