@@ -48,7 +48,7 @@ var http    = require('http'),
 var TelegramBot = require('node-telegram-bot-api');
 
 var token  = ctx.token,
-    tghook = 'https://'+ctx.hook.address+':'+ctx.hook.port+'/'+token;//+'/setWebhook';
+    tghook = ctx.hook.address+':'+ctx.hook.port+'/'+token;//+'/setWebhook';
 
 debug(ctx);
 debug(tghook);
