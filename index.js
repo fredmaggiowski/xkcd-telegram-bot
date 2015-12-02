@@ -171,10 +171,11 @@ setTimeout( function getLatestComicPolling( ){
       }
 
       theLatest = JSON.parse(body).num;
-			redis.set("latestcomic", JSON.parse(body).num, function (err, reply){ 
+		/*	redis.set("latestcomic", JSON.parse(body).num, function (err, reply){ 
 				reqdbg(err);
 				reqdbg(reply);
 			});	
+*/
     } 
   })
 }, ctx.polling);
