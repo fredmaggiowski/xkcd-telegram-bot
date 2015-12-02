@@ -57,7 +57,7 @@ log.info(tghook);
 var theLatest = 0; // Should put this in REDIS (when I'll install it)
 
 var bot = new TelegramBot(token, {webHook: {port: port, host: host}});
-bot.setWebHook(tghook);
+bot.setWebHook('xkcdbot-fredmaggiowski.rhcloud.com:443/bot'+token);
 
 log.info(bot);
 
