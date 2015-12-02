@@ -52,6 +52,7 @@ var token  = ctx.token,
 
 debug(ctx);
 debug(tghook);
+log.info(tghook);
 
 var theLatest = 0; // Should put this in REDIS (when I'll install it)
 
@@ -91,6 +92,7 @@ bot.on('message', function msgReceived(msg){
 function handleCommand( cmd, cb, pars ){
   var comic = {};
   cmddbg(cmd);
+  log.info(cmd);
 
   switch(cmd.split('@')[0]){
     case '/random': 
@@ -100,8 +102,11 @@ function handleCommand( cmd, cb, pars ){
       return retrieveComic(number, cb);
 
     case '/getxkcd':
-      if( pars === undefined )
-        return cb(JSON.stringify({error: 'No comic number provided'}), null);
+      if( pars === undefined ){
+        var err = {error: 'No comic number provided'};
+        log.error(err);
+        return cb(JSON.stringify(), null);
+      }
 
       cmddbg('Required comic #',pars[0]);
       return retrieveComic(pars[1], cb);
@@ -137,6 +142,8 @@ function handleCommand( cmd, cb, pars ){
  */
 function retrieveComic( number, cb ){
   
+  log.info(number);
+
   if( number > theLatest )
     cb(JSON.stringify({error: 'this comic does not exists, yet!'}),null);
   
@@ -144,12 +151,15 @@ function retrieveComic( number, cb ){
   
   var url = 'http://xkcd.com/'+number+'/info.0.json';
   reqdbg('url: %s',url);
-  
+  log.info(reqdbg);
+
   request(url, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       console.log(body);
-      cb(null, body);
+      return cb(null, body);
     }
+
+    log.error(error);
   });
 }
 
@@ -168,6 +178,7 @@ setTimeout( function getLatestComicPolling( ){
         // redis.get('all the chat id', function () { bot.sendMessage() } );
 
         reqdbg('YAY! NEW COMIC!');
+        log.info('YAY! NEW COMIC!');
       }
 
       theLatest = JSON.parse(body).num;
