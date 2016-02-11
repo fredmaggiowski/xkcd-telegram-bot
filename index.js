@@ -6,12 +6,9 @@
  *  Thanks to Randall Munroe for all the fun!
  */
 'use strict';
+
 // Load configuration
 var ctx = require('./config/config.json');
-
-// We're moving on OpenShift RHCloud
-var port = process.env.OPENSHIFT_NODEJS_PORT;
-var host = process.env.OPENSHIFT_NODEJS_IP;
 
 // Require debug and logging modules
 var debug  = require('debug')('debug'),
@@ -37,35 +34,31 @@ var bunyan = require('bunyan'),
           } 
         ]
       }
-    );
+    )
 
 // Require useful modules
-var http    = require('http'),
-    request = require('request');
-    // redis   = require('redis').createClient();//ctx.redis.port, ctx.redis.host);
+var request = require('request')
+//    redis   = require('redis').createClient(ctx.redis.port, ctx.redis.host);
 
 // Require node.js telegram Bot API
-var TelegramBot = require('node-telegram-bot-api');
+var TelegramBot = require('node-telegram-bot-api')
 
 var token  = ctx.token,
-    tghook = ctx.hook.address+':'+ctx.hook.port+'/'+token;//+'/setWebhook';
+    tghook = 'https://'+ctx.hook.address+':'+ctx.hook.port+'/'+token //+'/setWebhook';
 
 debug(ctx);
 debug(tghook);
-log.info(tghook);
 
-var theLatest = 0; // Should put this in REDIS (when I'll install it)
+var theLatest = 0 // Should put this in REDIS (when I'll install it)
 
-var bot = new TelegramBot(token, {webHook: {port: port, host: host}});
-bot.setWebHook('xkcdbot-fredmaggiowski.rhcloud.com:443/bot'+token);
-
-log.info(bot);
+var bot = new TelegramBot(token, {webHook: {port: ctx.hook.port, host: ctx.hook.address, cert:ctx.cert.crt, key:ctx.cert.key}})
+bot.setWebHook(tghook, ctx.cert.crt) 
 
 bot.on('message', function msgReceived(msg){
   
   log.info(msg);
 
-  debug('messaggio:', msg);
+  debug('message:', msg);
 
   var chatId = msg.chat.id;
   var msgarr = msg.text.split(' ');
@@ -74,20 +67,16 @@ bot.on('message', function msgReceived(msg){
 
   handleCommand( msgarr[0], function ( err, comic ){
 
-    if( err ){
-      log.error(err);
-      return bot.sendMessage(chatId, JSON.parse(err).error);
-    }
+    if( err )
+      return
 
     // Do something with the comic.. like sending it via bot.sendMessage
     comic = JSON.parse(comic);
-    log.info(comic);
     debug(comic);
-
     bot.sendMessage(chatId, comic.title+'\n'+comic.img+'\n'+comic.alt);
 
-  }, msgarr); 
-});
+  }, msgarr) 
+})
 
 /*
  *  Handle given command
@@ -98,7 +87,6 @@ bot.on('message', function msgReceived(msg){
 function handleCommand( cmd, cb, pars ){
   var comic = {};
   cmddbg(cmd);
-  log.info(cmd);
 
   switch(cmd.split('@')[0]){
     case '/random': 
@@ -108,11 +96,8 @@ function handleCommand( cmd, cb, pars ){
       return retrieveComic(number, cb);
 
     case '/getxkcd':
-      if( pars === undefined ){
-        var err = {error: 'No comic number provided'};
-        log.error(err);
-        return cb(JSON.stringify(), null);
-      }
+      if( pars === undefined )
+        return cb(JSON.stringify({error: 'No comic number provided'}), null);
 
       cmddbg('Required comic #',pars[0]);
       return retrieveComic(pars[1], cb);
@@ -148,8 +133,6 @@ function handleCommand( cmd, cb, pars ){
  */
 function retrieveComic( number, cb ){
   
-  log.info(number);
-
   if( number > theLatest )
     cb(JSON.stringify({error: 'this comic does not exists, yet!'}),null);
   
@@ -157,16 +140,13 @@ function retrieveComic( number, cb ){
   
   var url = 'http://xkcd.com/'+number+'/info.0.json';
   reqdbg('url: %s',url);
-  log.info(reqdbg);
-
+  
   request(url, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       console.log(body);
-      return cb(null, body);
+      cb(null, body);
     }
- 
-    log.error(error);
-  });
+  })
 }
 
 /*
@@ -183,40 +163,14 @@ setTimeout( function getLatestComicPolling( ){
         // Let's do somenthig amazing, like:
         // redis.get('all the chat id', function () { bot.sendMessage() } );
 
-        reqdbg('YAY! NEW COMIC!');
-        log.info('YAY! NEW COMIC!');
+        reqdbg('YAY! NEW COMIC!')
       }
 
-      theLatest = JSON.parse(body).num;
-		/*	redis.set("latestcomic", JSON.parse(body).num, function (err, reply){ 
-				reqdbg(err);
-				reqdbg(reply);
-			});	
-*/
+      theLatest = JSON.parse(body).num
+  /*    redis.set("latestcomic", JSON.parse(body).num, function (err, reply){ 
+        reqdbg(err);
+        reqdbg(reply);
+      }); */
     } 
   })
-}, ctx.polling);
-
-/*
-// This HTTP server is for testing purposes! In future updates it will be started only when required!
-http.createServer( function (req,res){
-  
-    var jsonString = '';
-    req.on('data', function (data) {
-      jsonString += data;
-    });
-
-    req.on('end', function () {
-      console.log(JSON.parse(jsonString));
-
-      handleCommand( JSON.parse(jsonString).command, function (err, comic){
-
-        if( err )
-          return res.end(JSON.stringify(err));  
-        
-        res.end(JSON.stringify(comic));
-      },JSON.parse(jsonString).pars); 
-    });
-  })
-  .listen(8444);
-*/
+}, ctx.polling)

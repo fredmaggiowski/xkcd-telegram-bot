@@ -1,13 +1,15 @@
 # xkcd Telegram bot
 ## Thanks to Randall Munroe for all the fun
-                
-        It'll be online soon, be patient
+
+All contents come from [xkcd.com](http://xkcd.com)
+
+Chat with [@xkcd_unofficial_bot](https://telegram.me/xkcd_unofficial_bot)
 
 # Commands
-- latest
-- random
-- getxkcd (specify a number)
-- now
+- `/latest`
+- `/random`
+- `/getxkcd N` (specify a number, e.g. `/getxkcd 30`)
+- `/now`
 
 # Configuration
 The configuration file must be placed in **config/** directory and must be named **config.json**. Look at the **config/sample-config.json** to know what you should and shouldn't config!
