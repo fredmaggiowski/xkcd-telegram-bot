@@ -37,8 +37,7 @@ var bunyan = require('bunyan'),
     )
 
 // Require useful modules
-var request = require('request'),
-		fs			= require('fs')
+var request = require('request')
 //    redis   = require('redis').createClient(ctx.redis.port, ctx.redis.host);
 
 // Require node.js telegram Bot API
@@ -53,7 +52,7 @@ debug(tghook);
 var theLatest = 0 // Should put this in REDIS (when I'll install it)
 
 var bot = new TelegramBot(token, {webHook: {port: ctx.hook.port, host: ctx.hook.address, cert:ctx.cert.crt, key:ctx.cert.key}})
-bot.setWebHook(tghook, ctx.cert.crt) // require('fs').readFileSync(ctx.cert.crt, 'utf-8'));
+bot.setWebHook(tghook, ctx.cert.crt) 
 
 bot.on('message', function msgReceived(msg){
   
@@ -69,7 +68,7 @@ bot.on('message', function msgReceived(msg){
   handleCommand( msgarr[0], function ( err, comic ){
 
     if( err )
-      return bot.sendMessage(chatId, JSON.parse(err).error)
+      return
 
     // Do something with the comic.. like sending it via bot.sendMessage
     comic = JSON.parse(comic);
