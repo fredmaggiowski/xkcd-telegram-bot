@@ -33,32 +33,33 @@ var bunyan = require('bunyan'),
           } 
         ]
       }
-    );
+    )
 
 // Require useful modules
-var http    = require('http'),
-    request = require('request');
+var https   = require('https'),
+    request = require('request'),
+		fs			= require('fs')
 //    redis   = require('redis').createClient(ctx.redis.port, ctx.redis.host);
 
 // Require node.js telegram Bot API
-var TelegramBot = require('node-telegram-bot-api');
+var TelegramBot = require('node-telegram-bot-api')
 
 var token  = ctx.token,
-    tghook = 'https://'+ctx.hook.address+':'+ctx.hook.port+'/'+token;//+'/setWebhook';
+    tghook = 'https://'+ctx.hook.address+':'+ctx.hook.port+'/'+token //+'/setWebhook';
 
 debug(ctx);
 debug(tghook);
 
-var theLatest = 0; // Should put this in REDIS (when I'll install it)
+var theLatest = 0 // Should put this in REDIS (when I'll install it)
 
 var bot = new TelegramBot(token, {webHook: {port: ctx.hook.port, host: ctx.hook.address, cert:ctx.cert.crt, key:ctx.cert.key}})
-bot.setWebHook(tghook, ctx.cert.crt);// require('fs').readFileSync(ctx.cert.crt, 'utf-8'));
+bot.setWebHook(tghook, ctx.cert.crt) // require('fs').readFileSync(ctx.cert.crt, 'utf-8'));
 
 bot.on('message', function msgReceived(msg){
   
   log.info(msg);
 
-  debug('messaggio:', msg);
+  debug('message:', msg);
 
   var chatId = msg.chat.id;
   var msgarr = msg.text.split(' ');
@@ -68,15 +69,15 @@ bot.on('message', function msgReceived(msg){
   handleCommand( msgarr[0], function ( err, comic ){
 
     if( err )
-      return bot.sendMessage(chatId, JSON.parse(err).error);
+      return bot.sendMessage(chatId, JSON.parse(err).error)
 
     // Do something with the comic.. like sending it via bot.sendMessage
     comic = JSON.parse(comic);
     debug(comic);
     bot.sendMessage(chatId, comic.title+'\n'+comic.img+'\n'+comic.alt);
 
-  }, msgarr); 
-});
+  }, msgarr) 
+})
 
 /*
  *  Handle given command
@@ -146,7 +147,7 @@ function retrieveComic( number, cb ){
       console.log(body);
       cb(null, body);
     }
-  });
+  })
 }
 
 /*
@@ -163,36 +164,15 @@ setTimeout( function getLatestComicPolling( ){
         // Let's do somenthig amazing, like:
         // redis.get('all the chat id', function () { bot.sendMessage() } );
 
-        reqdbg('YAY! NEW COMIC!');
+        reqdbg('YAY! NEW COMIC!')
       }
 
-      theLatest = JSON.parse(body).num;
+      theLatest = JSON.parse(body).num
 	/*		redis.set("latestcomic", JSON.parse(body).num, function (err, reply){ 
 				reqdbg(err);
 				reqdbg(reply);
 			});	*/
     } 
   })
-}, ctx.polling);
+}, ctx.polling)
 
-// This HTTP server is for testing purposes! In future updates it will be started only when required!
-http.createServer( function (req,res){
-  
-    var jsonString = '';
-    req.on('data', function (data) {
-      jsonString += data;
-    });
-
-    req.on('end', function () {
-      console.log(JSON.parse(jsonString));
-
-      handleCommand( JSON.parse(jsonString).command, function (err, comic){
-
-        if( err )
-          return res.end(JSON.stringify(err));  
-        
-        res.end(JSON.stringify(comic));
-      },JSON.parse(jsonString).pars); 
-    });
-  })
-  .listen(8444);
