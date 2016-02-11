@@ -5,15 +5,15 @@
  *
  *  Thanks to Randall Munroe for all the fun!
  */
-'use strict';
+'use strict'
 
 // Load configuration
-var ctx = require('./config/config.json');
+var ctx = require('./config/config.json')
 
 // Require debug and logging modules
 var debug  = require('debug')('debug'),
     reqdbg = require('debug')('request'),
-    cmddbg = require('debug')('cmd');
+    cmddbg = require('debug')('cmd')
 
 var bunyan = require('bunyan'),
     log    = bunyan.createLogger(
@@ -38,32 +38,29 @@ var bunyan = require('bunyan'),
 
 // Require useful modules
 var request = require('request')
-//    redis   = require('redis').createClient(ctx.redis.port, ctx.redis.host);
 
 // Require node.js telegram Bot API
 var TelegramBot = require('node-telegram-bot-api')
 
 var token  = ctx.token,
-    tghook = 'https://'+ctx.hook.address+':'+ctx.hook.port+'/'+token //+'/setWebhook';
+    tghook = 'https://'+ctx.hook.address+':'+ctx.hook.port+'/'+token
 
-debug(ctx);
-debug(tghook);
+debug(ctx)
+debug(tghook)
 
-var theLatest = 0 // Should put this in REDIS (when I'll install it)
+var theLatest = 0
 
 var bot = new TelegramBot(token, {webHook: {port: ctx.hook.port, host: ctx.hook.address, cert:ctx.cert.crt, key:ctx.cert.key}})
 bot.setWebHook(tghook, ctx.cert.crt) 
 
 bot.on('message', function msgReceived(msg){
   
-  log.info(msg);
+  log.info(msg)
 
-  debug('message:', msg);
+  debug('message:', msg)
 
-  var chatId = msg.chat.id;
-  var msgarr = msg.text.split(' ');
-
-  //  redis.set(ctx.redis.lbl.chatid,chatId); // We'll store chatid.. later
+  var chatId = msg.chat.id
+  var msgarr = msg.text.split(' ')
 
   handleCommand( msgarr[0], function ( err, comic ){
 
@@ -71,9 +68,9 @@ bot.on('message', function msgReceived(msg){
       return
 
     // Do something with the comic.. like sending it via bot.sendMessage
-    comic = JSON.parse(comic);
-    debug(comic);
-    bot.sendMessage(chatId, comic.title+'\n'+comic.img+'\n'+comic.alt);
+    comic = JSON.parse(comic)
+    debug(comic)
+    bot.sendMessage(chatId, comic.title+'\n'+comic.img+'\n'+comic.alt)
 
   }, msgarr) 
 })
@@ -85,44 +82,44 @@ bot.on('message', function msgReceived(msg){
  *  @param {String Array} pars: Optional extra paramethers
  */
 function handleCommand( cmd, cb, pars ){
-  var comic = {};
-  cmddbg(cmd);
+  var comic = {}
+  cmddbg(cmd)
 
   switch(cmd.split('@')[0]){
     case '/random': 
-      cmddbg('Random comic required');
-      var number = Math.floor(Math.random() * (theLatest + 1));
-      cmddbg('random number picked: %d', number);
-      return retrieveComic(number, cb);
+      cmddbg('Random comic required')
+      var number = Math.floor(Math.random() * (theLatest + 1))
+      cmddbg('random number picked: %d', number)
+      return retrieveComic(number, cb)
 
     case '/getxkcd':
       if( pars === undefined )
-        return cb(JSON.stringify({error: 'No comic number provided'}), null);
+        return cb(JSON.stringify({error: 'No comic number provided'}), null)
 
-      cmddbg('Required comic #',pars[0]);
-      return retrieveComic(pars[1], cb);
+      cmddbg('Required comic #',pars[0])
+      return retrieveComic(pars[1], cb)
 
     case '/latest':
-      cmddbg('Required latest comic');
-      return retrieveComic(0, cb);
+      cmddbg('Required latest comic')
+      return retrieveComic(0, cb)
 
     case '/test':
-      cmddbg('Test command fired');
-      bot.sendMessage(chatId, 'Fuck @AlexLanGame');
-      break;
+      cmddbg('Test command fired')
+      bot.sendMessage(chatId, 'Fuck @AlexLanGame')
+      break
 
     case '/now':
-      cmddbg('Now command fired');
-      return retrieveComic(1335, cb); //xkcd.com/now : 1335
+      cmddbg('Now command fired')
+      return retrieveComic(1335, cb) // http://xkcd.com/now : 1335
 
     case '/help':
-      cmddbg('Help command');
-      return cb(JSON.stringify({error: 'Help:\n\t- /getxkcd NUMBER -> get chosen comic\n\t- /random -> get a random comic\n\t- /latest -> get latest comic'}),null);
+      cmddbg('Help command')
+      return cb(JSON.stringify({error: 'Help:\n\t- /getxkcd NUMBER -> get chosen comic\n\t- /random -> get a random comic\n\t- /latest -> get latest comic'}),null)
 
     default:
-      cmddbg('Default case');
-      log.error('Command not found %s',cmd);
-      return cb(JSON.stringify({error: 'command not found'}), null);
+      cmddbg('Default case')
+      log.error('Command not found %s',cmd)
+      return cb(JSON.stringify({error: 'command not found'}), null)
   }
 }
 
@@ -134,17 +131,17 @@ function handleCommand( cmd, cb, pars ){
 function retrieveComic( number, cb ){
   
   if( number > theLatest )
-    cb(JSON.stringify({error: 'this comic does not exists, yet!'}),null);
+    cb(JSON.stringify({error: 'this comic does not exists, yet!'}),null)
   
-  number = number === 0 ? '' : number;
+  number = number === 0 ? '' : number
   
-  var url = 'http://xkcd.com/'+number+'/info.0.json';
-  reqdbg('url: %s',url);
+  var url = 'http://xkcd.com/'+number+'/info.0.json'
+  reqdbg('url: %s',url)
   
   request(url, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      console.log(body);
-      cb(null, body);
+      console.log(body)
+      cb(null, body)
     }
   })
 }
@@ -158,19 +155,13 @@ setTimeout( function getLatestComicPolling( ){
     if( !error && response.statusCode === 200 ){
       
       if( theLatest < JSON.parse(body).num ){
-        // Hey! We've got a new comic!!
+        // Hey! We've got a new comic!
 
-        // Let's do somenthig amazing, like:
-        // redis.get('all the chat id', function () { bot.sendMessage() } );
-
-        reqdbg('YAY! NEW COMIC!')
+        // Let's do somenthig amazing!
+        reqdbg('New comic found')
       }
 
       theLatest = JSON.parse(body).num
-  /*    redis.set("latestcomic", JSON.parse(body).num, function (err, reply){ 
-        reqdbg(err);
-        reqdbg(reply);
-      }); */
     } 
   })
 }, ctx.polling)
