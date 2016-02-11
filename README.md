@@ -1,6 +1,8 @@
 # xkcd Telegram bot
 ## Thanks to Randall Munroe for all the fun
-                
+
+All contents come from [xkcd.com](http://xkcd.com)
+
 Chat with [@xkcd_unofficial_bot](https://telegram.me/xkcd_unofficial_bot)
 
 # Commands
