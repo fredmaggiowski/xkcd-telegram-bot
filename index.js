@@ -6,6 +6,7 @@
  *  Thanks to Randall Munroe for all the fun!
  */
 'use strict';
+
 // Load configuration
 var ctx = require('./config/config.json');
 
@@ -36,8 +37,7 @@ var bunyan = require('bunyan'),
     )
 
 // Require useful modules
-var https   = require('https'),
-    request = require('request'),
+var request = require('request'),
 		fs			= require('fs')
 //    redis   = require('redis').createClient(ctx.redis.port, ctx.redis.host);
 
