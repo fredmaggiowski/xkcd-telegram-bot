@@ -70,7 +70,11 @@ bot.on('message', function msgReceived(msg){
     // Do something with the comic.. like sending it via bot.sendMessage
     comic = JSON.parse(comic)
     debug(comic)
-    bot.sendMessage(chatId, comic.title+'\n'+comic.img+'\n'+comic.alt)
+
+		if (comic.title === 'help') // It's not the comic, it's the help page :)
+			return bot.sendMessage(chatId, comic.help)
+
+    return bot.sendMessage(chatId, comic.title+'\n'+comic.img+'\n'+comic.alt)
 
   }, msgarr) 
 })
@@ -114,7 +118,7 @@ function handleCommand( cmd, cb, pars ){
 
     case '/help':
       cmddbg('Help command')
-      return cb(JSON.stringify({error: 'Help:\n\t- /getxkcd NUMBER -> get chosen comic\n\t- /random -> get a random comic\n\t- /latest -> get latest comic'}),null)
+      return cb(null, JSON.stringify({title: 'help', help:'Help:\n\t- /getxkcd NUMBER -> get chosen comic\n\t- /random -> get a random comic\n\t- /latest -> get latest comic\n\t- /now'}))
 
     default:
       cmddbg('Default case')
