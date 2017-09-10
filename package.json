@@ -2,10 +2,10 @@
   "name": "xkcd-telegram-bot",
   "version": "1.0.0",
   "description": "An unofficial node.js based telegram bot for to share the awesomeness of xkcd.com ",
-  "main": "index.js",
+  "main": "bot.js",
   "scripts": {
-		"boot": "forever start --uid \"xkcdbot\" -a index.js",
-		"stop": "forever stop \"xkcdbot\"",
+    "boot": "forever start --uid \"xkcdbot\" -a bot.js",
+    "stop": "forever stop \"xkcdbot\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
