@@ -20,7 +20,7 @@ let theLatest = 0;
 let bot = new TelegramBot(token, {
   webHook: {port: ctx.hook.port, host: ctx.hook.address, cert:ctx.cert.crt, key:ctx.cert.key}
 });
-bot.setWebHook(tghook, ctx.cert.crt);
+bot.setWebHook(tghook, {certificate: ctx.cert.crt});
 
 bot.on('message', (msg) => {
   console.log(msg);
