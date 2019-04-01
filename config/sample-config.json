@@ -5,6 +5,7 @@
 		"key" : "certificate.key"
 	},
 	"hook" : {
+		"bind": "0.0.0.0",
 		"address" : "webhook-address",
 		"port" : 8443
 	},

@@ -18,7 +18,7 @@ let tghook = 'https://'+ctx.hook.address+':'+ctx.hook.port+'/'+token;
 
 let theLatest = 0;
 let bot = new TelegramBot(token, {
-  webHook: {port: ctx.hook.port, host: ctx.hook.address, cert:ctx.cert.crt, key:ctx.cert.key}
+  webHook: {port: ctx.hook.port, host: ctx.hook.bind, cert:ctx.cert.crt, key:ctx.cert.key}
 });
 bot.setWebHook(tghook, {certificate: ctx.cert.crt});
 
